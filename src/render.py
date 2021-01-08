@@ -8,6 +8,8 @@
 
 import colorama
 
+colorama.init(autoreset=True)
+
 
 class Renderer:
     """
@@ -17,7 +19,6 @@ class Renderer:
     """
 
     def __init__(self, w: int, h: int):
-        colorama.init(autoreset=True)
         self.frame_width = w
         self.frame_height = h
         self.frame_buffer = [[[' ' for _ in range(h)] for _ in range(w)] for _ in range(2)]
@@ -59,6 +60,20 @@ class Renderer:
         """
         self._write_fb(x - 1, y - 1, getattr(colorama.Fore, color.upper()) + u'\u2589')
 
+    def block(self, x: int, y: int, w: int, h: int, color: str = 'black'):
+        """
+        Render a block with pure color to framebuffer.
+        :param x: Render position x
+        :param y: Render position y
+        :param w: Block width in character
+        :param h: Block height in character
+        :param color:
+        """
+        c = getattr(colorama.Fore, color.upper())
+        for i in range(x - 1, x - 1 + w):
+            for j in range(y - 1, y - 1 + h):
+                self._write_fb(i, j, c + u'\u2589')
+
     def string(self, art: str, x: int, y: int, fore_color: str = 'black', back_color: str = ''):
         """
         Render ascii art to framebuffer.
@@ -79,12 +94,11 @@ class Renderer:
 
     def swap_buffer(self):
         """
-        Swap and render front and back buffer.
+        Swap and render front and back buffer and print to screen.
         """
-        print(colorama.Cursor.POS(1, 1))
         self.frame_buffer[0], self.frame_buffer[1] = self.frame_buffer[1], self.frame_buffer[0]
         for y in range(self.frame_height):
             for x in range(self.frame_width):
-                print(self.frame_buffer[0][x][y], end='')
-            if y != self.frame_height - 1:
-                print()
+                if self.frame_buffer[0][x][y] != self.frame_buffer[1][x][y]:
+                    print(colorama.Cursor.POS(x + 1, y + 1) + self.frame_buffer[0][x][y], end='')
+        print(colorama.Cursor.POS(1, 1))

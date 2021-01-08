@@ -11,11 +11,12 @@ Rena is a codebase for 2D terminal game in `Python`.
 + Linear layout support
 + Input support (implement with `keyboard`)
 + Colored double buffer rendering (implement with `colorama`)
++ Event Loop
++ "Select" control
 
 ### TODO
 
-+ Event loop
-+ Controls
++ More controls
 + More layout methods
 + Assets management
 + Local storage

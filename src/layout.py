@@ -10,7 +10,10 @@ import render
 
 
 class Layout:
-    """ Layout base. """
+    """
+    Layout base.
+    :param parent: Parent layout
+    """
 
     def __init__(self, parent=None):
         self.parent = parent
@@ -19,15 +22,14 @@ class Layout:
         self.children = []
 
 
-class UI:
+class LayoutManager:
     """
-    UI instance.
-    :param root: Root layout of UI
+    LayoutManager instance.
     :param renderer: Renderer for rendering
     """
 
-    def __init__(self, root: Layout, renderer: render.Renderer):
-        self.root_layout = root
+    def __init__(self, renderer: render.Renderer, vertical_root: bool = False):
+        self.root_layout = LayoutManager.Vertical(0) if vertical_root else LayoutManager.Horizontal(0)
         self.renderer = renderer
 
     def draw(self):
@@ -43,17 +45,17 @@ class UI:
             w = renderer.frame_width
             h = renderer.frame_height
         else:
-            if isinstance(layout, Horizontal):
+            if isinstance(layout, LayoutManager.Horizontal):
                 w = layout.parent.w
                 h = layout.h
-            elif isinstance(layout, Vertical):
+            elif isinstance(layout, LayoutManager.Vertical):
                 w = layout.w
                 h = layout.parent.h
-        if isinstance(layout, Horizontal):
+        if isinstance(layout, LayoutManager.Horizontal):
             x = 1
             is_container = True
             for i in layout.children:
-                if isinstance(i, Vertical):
+                if isinstance(i, LayoutManager.Vertical):
                     is_container = False
                     r = render.Renderer(i.w, h)
                     r.clear(i.back_color)
@@ -65,16 +67,25 @@ class UI:
                 else:
                     if not is_container:
                         break
-                    if isinstance(i, Image):
+                    if isinstance(i, LayoutManager.Image):
                         x_offset = w // 2 - i.get_width() // 2
                         y_offset = h // 2 - i.get_height() // 2
-                        renderer.string(i.image, x + x_offset, 1 + y_offset, i.fore_color, i.back_color)
+                        i.render(renderer, x + x_offset, 1 + y_offset)
                         break
-        elif isinstance(layout, Vertical):
+                    if isinstance(i, LayoutManager.Label):
+                        x_offset = w // 2 - i.get_width() // 2
+                        y_offset = h // 2
+                        i.render(renderer, x + x_offset, 1 + y_offset)
+                        break
+                    if isinstance(i, LayoutManager.Block):
+                        x_offset = w // 2 - i.w // 2
+                        y_offset = h // 2 - i.h // 2
+                        i.render(renderer, x + x_offset, 1 + y_offset)
+        elif isinstance(layout, LayoutManager.Vertical):
             y = 1
             is_container = True
             for i in layout.children:
-                if isinstance(i, Horizontal):
+                if isinstance(i, LayoutManager.Horizontal):
                     is_container = False
                     r = render.Renderer(w, i.h)
                     r.clear(i.back_color)
@@ -86,88 +97,156 @@ class UI:
                 else:
                     if not is_container:
                         break
-                    if isinstance(i, Image):
+                    if isinstance(i, LayoutManager.Image):
                         x_offset = w // 2 - i.get_width() // 2
                         y_offset = h // 2 - i.get_height() // 2
-                        renderer.string(i.image, 1 + x_offset, y + y_offset, i.fore_color, i.back_color)
+                        i.render(renderer, 1 + x_offset, y + y_offset)
                         break
+                    if isinstance(i, LayoutManager.Label):
+                        x_offset = w // 2 - i.get_width() // 2
+                        y_offset = h // 2
+                        i.render(renderer, 1 + x_offset, y + y_offset)
+                        break
+                    if isinstance(i, LayoutManager.Block):
+                        x_offset = w // 2 - i.w // 2
+                        y_offset = h // 2 - i.h // 2
+                        i.render(renderer, 1 + x_offset, y + y_offset)
 
-
-class Vertical(Layout):
-    """
-    Vertical linear layout.
-    :param w: Layout width in character
-    :param parent: Parent layout, None for root
-    :param margin_left: Left margin width
-    :param margin_right: right margin width
-    :param back_color: Layout background color
-    """
-
-    def __init__(self, w: int, parent: Layout = None,
-                 margin_left: int = 0, margin_right: int = 0,
-                 back_color: str = ''):
-        super(Vertical, self).__init__(parent)
-        self.w = w
-        self.ml = margin_left
-        self.mr = margin_right
-        self.back_color = back_color
-
-
-class Horizontal(Layout):
-    """
-    Horizontal linear layout.
-    :param h: Layout height in character
-    :param parent: Parent layout, None for root
-    :param margin_top: Top margin height
-    :param margin_bottom: Bottom margin height
-    :param back_color: Layout background color
-    """
-
-    def __init__(self, h: int, parent: Layout = None,
-                 margin_top: int = 0, margin_bottom: int = 0,
-                 back_color: str = ''):
-        super(Horizontal, self).__init__(parent)
-        self.h = h
-        self.mt = margin_top
-        self.mb = margin_bottom
-        self.back_color = back_color
-
-
-class Control(Layout):
-    """
-    Control base.
-    :param parent: Parent layout
-    """
-
-    def __init__(self, parent: Layout):
-        super(Control, self).__init__(parent)
-
-
-class Image(Control):
-    """
-    Image, ASCII art control.
-    :param image: Image string
-    :param parent: Parent layout
-    :param fore_color: Character color
-    :param back_color: Background color
-    """
-
-    def __init__(self, image: str, parent: Layout, fore_color: str = 'black', back_color: str = ''):
-        super(Image, self).__init__(parent)
-        self.image = image
-        self.fore_color = fore_color
-        self.back_color = back_color
-
-    def get_width(self):
+    class Vertical(Layout):
         """
-        Get width of the image.
-        :return: Max line width
+        Vertical linear layout.
+        :param w: Layout width in character
+        :param parent: Parent layout, None for root
+        :param margin_left: Left margin width
+        :param margin_right: right margin width
+        :param back_color: Layout background color
         """
-        return max(map(len, self.image.split('\n')))
 
-    def get_height(self):
+        def __init__(self, w: int, parent: Layout = None,
+                     margin_left: int = 0, margin_right: int = 0,
+                     back_color: str = ''):
+            super(LayoutManager.Vertical, self).__init__(parent)
+            self.w = w
+            self.ml = margin_left
+            self.mr = margin_right
+            self.back_color = back_color
+
+    class Horizontal(Layout):
         """
-        Get height of the image.
-        :return: Lines amount
+        Horizontal linear layout.
+        :param h: Layout height in character
+        :param parent: Parent layout, None for root
+        :param margin_top: Top margin height
+        :param margin_bottom: Bottom margin height
+        :param back_color: Layout background color
         """
-        return len(self.image.split('\n'))
+
+        def __init__(self, h: int, parent: Layout = None,
+                     margin_top: int = 0, margin_bottom: int = 0,
+                     back_color: str = ''):
+            super(LayoutManager.Horizontal, self).__init__(parent)
+            self.h = h
+            self.mt = margin_top
+            self.mb = margin_bottom
+            self.back_color = back_color
+
+    class Primitive(Layout):
+        """
+        Primitive base.
+        :param parent: Parent layout
+        :param fore_color: Character color
+        :param back_color: Background color
+        """
+
+        def __init__(self, parent: Layout, fore_color: str = 'black', back_color: str = ''):
+            super(LayoutManager.Primitive, self).__init__(parent)
+            self.fore_color = fore_color
+            self.back_color = back_color
+
+    class Image(Primitive):
+        """
+        Image, ASCII art primitive.
+        :param image: Image string
+        :param parent: Parent layout
+        :param fore_color: Character color
+        :param back_color: Background color
+        """
+
+        def __init__(self, image: str, parent: Layout, fore_color: str = 'black', back_color: str = ''):
+            super(LayoutManager.Image, self).__init__(parent, fore_color, back_color)
+            self.image = image
+
+        def get_width(self):
+            """
+            Get width of the image.
+            :return: Max line width
+            """
+            return max(map(len, self.image.split('\n')))
+
+        def get_height(self):
+            """
+            Get height of the image.
+            :return: Lines amount
+            """
+            return len(self.image.split('\n'))
+
+        def render(self, r: render.Renderer, x: int, y: int):
+            """
+            Render image with a renderer.
+            :param r: Renderer
+            :param x: Start position x
+            :param y: Start position y
+            """
+            r.string(self.image, x, y, self.fore_color, self.back_color)
+
+    class Label(Primitive):
+        """
+        Single line text label.
+        :param text: Label text
+        :param parent: Parent layout
+        :param fore_color: Character color
+        :param back_color: Background color
+        """
+
+        def __init__(self, text: str, parent: Layout, fore_color: str = 'black', back_color: str = ''):
+            super(LayoutManager.Label, self).__init__(parent, fore_color, back_color)
+            self.text = text
+
+        def get_width(self):
+            """
+            Get width of the label.
+            :return: Label text length
+            """
+            return len(self.text)
+
+        def render(self, r: render.Renderer, x: int, y: int):
+            """
+            Render label with a renderer.
+            :param r: Renderer
+            :param x: Start position x
+            :param y: Start position y
+            """
+            r.string(self.text, x, y, self.fore_color, self.back_color)
+
+    class Block(Primitive):
+        """
+        Block with pure color.
+        :param w: Block width
+        :param h: Block height
+        :param parent: Parent layout
+        :param color: Fill color
+        """
+
+        def __init__(self, w: int, h: int, parent: Layout, color: str = 'black'):
+            super(LayoutManager.Block, self).__init__(parent, color, color)
+            self.w = w
+            self.h = h
+
+        def render(self, r: render.Renderer, x: int, y: int):
+            """
+            Render block with a renderer.
+            :param r: Renderer
+            :param x: Start position x
+            :param y: Start position y
+            """
+            r.block(x, y, self.w, self.h, self.fore_color)
