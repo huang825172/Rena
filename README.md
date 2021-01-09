@@ -2,7 +2,7 @@
 
 Rena is a codebase for 2D terminal game in `Python`.
 
-![Rena](Rena.png)
+![Rena](Rena.gif)
 
 ### Features
 
