@@ -22,14 +22,14 @@ class Layout:
         self.children = []
 
 
-class LayoutManager:
+class LinearLayout:
     """
-    LayoutManager instance.
+    LinearLayout instance.
     :param renderer: Renderer for rendering
     """
 
     def __init__(self, renderer: render.Renderer, vertical_root: bool = False):
-        self.root_layout = LayoutManager.Vertical(0) if vertical_root else LayoutManager.Horizontal(0)
+        self.root_layout = LinearLayout.Vertical(0) if vertical_root else LinearLayout.Horizontal(0)
         self.renderer = renderer
 
     def draw(self):
@@ -45,17 +45,17 @@ class LayoutManager:
             w = renderer.frame_width
             h = renderer.frame_height
         else:
-            if isinstance(layout, LayoutManager.Horizontal):
+            if isinstance(layout, LinearLayout.Horizontal):
                 w = layout.parent.w
                 h = layout.h
-            elif isinstance(layout, LayoutManager.Vertical):
+            elif isinstance(layout, LinearLayout.Vertical):
                 w = layout.w
                 h = layout.parent.h
-        if isinstance(layout, LayoutManager.Horizontal):
+        if isinstance(layout, LinearLayout.Horizontal):
             x = 1
             is_container = True
             for i in layout.children:
-                if isinstance(i, LayoutManager.Vertical):
+                if isinstance(i, LinearLayout.Vertical):
                     is_container = False
                     r = render.Renderer(i.w, h)
                     r.clear(i.back_color)
@@ -67,25 +67,27 @@ class LayoutManager:
                 else:
                     if not is_container:
                         break
-                    if isinstance(i, LayoutManager.Image):
+                    if isinstance(i, LinearLayout.Image):
                         x_offset = w // 2 - i.get_width() // 2
                         y_offset = h // 2 - i.get_height() // 2
                         i.render(renderer, x + x_offset, 1 + y_offset)
                         break
-                    if isinstance(i, LayoutManager.Label):
+                    if isinstance(i, LinearLayout.Label):
                         x_offset = w // 2 - i.get_width() // 2
                         y_offset = h // 2
+                        if h % 2 == 0:
+                            y_offset -= 1
                         i.render(renderer, x + x_offset, 1 + y_offset)
                         break
-                    if isinstance(i, LayoutManager.Block):
+                    if isinstance(i, LinearLayout.Block):
                         x_offset = w // 2 - i.w // 2
                         y_offset = h // 2 - i.h // 2
                         i.render(renderer, x + x_offset, 1 + y_offset)
-        elif isinstance(layout, LayoutManager.Vertical):
+        elif isinstance(layout, LinearLayout.Vertical):
             y = 1
             is_container = True
             for i in layout.children:
-                if isinstance(i, LayoutManager.Horizontal):
+                if isinstance(i, LinearLayout.Horizontal):
                     is_container = False
                     r = render.Renderer(w, i.h)
                     r.clear(i.back_color)
@@ -97,17 +99,19 @@ class LayoutManager:
                 else:
                     if not is_container:
                         break
-                    if isinstance(i, LayoutManager.Image):
+                    if isinstance(i, LinearLayout.Image):
                         x_offset = w // 2 - i.get_width() // 2
                         y_offset = h // 2 - i.get_height() // 2
                         i.render(renderer, 1 + x_offset, y + y_offset)
                         break
-                    if isinstance(i, LayoutManager.Label):
+                    if isinstance(i, LinearLayout.Label):
                         x_offset = w // 2 - i.get_width() // 2
                         y_offset = h // 2
+                        if h % 2 == 0:
+                            y_offset -= 1
                         i.render(renderer, 1 + x_offset, y + y_offset)
                         break
-                    if isinstance(i, LayoutManager.Block):
+                    if isinstance(i, LinearLayout.Block):
                         x_offset = w // 2 - i.w // 2
                         y_offset = h // 2 - i.h // 2
                         i.render(renderer, 1 + x_offset, y + y_offset)
@@ -125,7 +129,7 @@ class LayoutManager:
         def __init__(self, w: int, parent: Layout = None,
                      margin_left: int = 0, margin_right: int = 0,
                      back_color: str = ''):
-            super(LayoutManager.Vertical, self).__init__(parent)
+            super(LinearLayout.Vertical, self).__init__(parent)
             self.w = w
             self.ml = margin_left
             self.mr = margin_right
@@ -144,7 +148,7 @@ class LayoutManager:
         def __init__(self, h: int, parent: Layout = None,
                      margin_top: int = 0, margin_bottom: int = 0,
                      back_color: str = ''):
-            super(LayoutManager.Horizontal, self).__init__(parent)
+            super(LinearLayout.Horizontal, self).__init__(parent)
             self.h = h
             self.mt = margin_top
             self.mb = margin_bottom
@@ -159,7 +163,7 @@ class LayoutManager:
         """
 
         def __init__(self, parent: Layout, fore_color: str = 'black', back_color: str = ''):
-            super(LayoutManager.Primitive, self).__init__(parent)
+            super(LinearLayout.Primitive, self).__init__(parent)
             self.fore_color = fore_color
             self.back_color = back_color
 
@@ -173,7 +177,7 @@ class LayoutManager:
         """
 
         def __init__(self, image: str, parent: Layout, fore_color: str = 'black', back_color: str = ''):
-            super(LayoutManager.Image, self).__init__(parent, fore_color, back_color)
+            super(LinearLayout.Image, self).__init__(parent, fore_color, back_color)
             self.image = image
 
         def get_width(self):
@@ -209,7 +213,7 @@ class LayoutManager:
         """
 
         def __init__(self, text: str, parent: Layout, fore_color: str = 'black', back_color: str = ''):
-            super(LayoutManager.Label, self).__init__(parent, fore_color, back_color)
+            super(LinearLayout.Label, self).__init__(parent, fore_color, back_color)
             self.text = text
 
         def get_width(self):
@@ -238,7 +242,7 @@ class LayoutManager:
         """
 
         def __init__(self, w: int, h: int, parent: Layout, color: str = 'black'):
-            super(LayoutManager.Block, self).__init__(parent, color, color)
+            super(LinearLayout.Block, self).__init__(parent, color, color)
             self.w = w
             self.h = h
 

@@ -13,6 +13,8 @@ Rena is a codebase for 2D terminal game in `Python`.
 + Colored double buffer rendering (implement with `colorama`)
 + Event Loop
 + "Select" control
++ Application
++ Page & router
 
 ### TODO
 

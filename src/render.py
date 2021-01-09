@@ -92,13 +92,16 @@ class Renderer:
             for j in range(len(lines[i - y + 1])):
                 self._write_fb(x - 1 + j, i, f_color + b_color + lines[i - y + 1][j])
 
-    def swap_buffer(self):
+    def swap_buffers(self, force: bool = False):
         """
         Swap and render front and back buffer and print to screen.
+        :param force: Force reprint all screen
         """
         self.frame_buffer[0], self.frame_buffer[1] = self.frame_buffer[1], self.frame_buffer[0]
         for y in range(self.frame_height):
             for x in range(self.frame_width):
-                if self.frame_buffer[0][x][y] != self.frame_buffer[1][x][y]:
+                if force:
+                    print(colorama.Cursor.POS(x + 1, y + 1) + self.frame_buffer[0][x][y], end='')
+                elif self.frame_buffer[0][x][y] != self.frame_buffer[1][x][y]:
                     print(colorama.Cursor.POS(x + 1, y + 1) + self.frame_buffer[0][x][y], end='')
         print(colorama.Cursor.POS(1, 1))
