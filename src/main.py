@@ -40,7 +40,8 @@ class Index(page.Page):
             self._selection_label.text = e.selection
 
     def _layout(self):
-        v = LinearLayout.Vertical(60, self._layout_manager.root_layout, margin_left=11, back_color='BLUE')
+        v = LinearLayout.Vertical(60, self._layout_manager.root_layout,
+                                  margin_left=11, back_color='BLUE')
         h_logo = LinearLayout.Horizontal(13, v, margin_top=1, back_color='CYAN')
         h_menu = LinearLayout.Horizontal(3, v, margin_top=1, back_color='GREEN')
         h_blocks = LinearLayout.Horizontal(4, v, margin_top=1, back_color='RED')

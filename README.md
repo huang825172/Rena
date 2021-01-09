@@ -14,7 +14,7 @@ Rena is a codebase for 2D terminal game in `Python`.
 + Event Loop
 + "Select" control
 + Application
-+ Page & router
++ Page & route
 
 ### TODO
 
