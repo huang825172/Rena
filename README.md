@@ -15,12 +15,18 @@ Rena is a codebase for 2D terminal game in `Python`.
 + "Select" control
 + Application
 + Page & route
++ Udp logcat
+
+### Known issue
+
++ Switch page when rendering new page cause wrong display result.
 
 ### TODO
 
++ Page life cycle
 + More controls
-+ More layout methods
-+ Assets management
 + Local storage
 + Networking
++ More layout methods
++ Assets management
 + Multi operating system / terminal emulator support

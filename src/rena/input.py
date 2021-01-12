@@ -6,7 +6,7 @@
 
 """ Input handling """
 
-import event
+from rena import event
 import keyboard
 
 

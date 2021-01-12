@@ -5,14 +5,8 @@
 # @Email : happy.huangyang@gmail.com
 
 """ Rena: The terminal Craft. """
-
 import asset
-import event
-import input
-import control
-import page
-from layout import LinearLayout
-from application import Application
+from rena import *
 
 
 class Index(page.Page):
@@ -64,6 +58,25 @@ class SecondPage(page.Page):
     def __init__(self, name: str, w: int, h: int, event_bus: event.EventBus):
         super(SecondPage, self).__init__(name, w, h, event_bus)
         self._keyboard_input.hook('e')
+        self.logcat = Logcat('Second Page')
+
+    def on_create(self):
+        """
+        Execute on page creation after __init__.
+        """
+        self.logcat.info('Second Page created.')
+
+    def on_pause(self):
+        """
+        Execute on page switched to background.
+        """
+        self.logcat.info('Second Page paused.')
+
+    def on_resume(self):
+        """
+        Execute on page switched to front ground.
+        """
+        self.logcat.info('Second Page resumed.')
 
     def _on_key(self, e: input.KeyEvent):
         if e.key == 'e' and e.action == 'down':
@@ -72,6 +85,9 @@ class SecondPage(page.Page):
 
 if __name__ == '__main__':
     app = Application('Rena', 80, 24)
+    logcat = Logcat('Rena')
+    logcat.info('Start')
     app.add_page(Index, 'index', is_index=True)
     app.add_page(SecondPage, 'second')
     app.run()
+    logcat.close()

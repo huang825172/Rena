@@ -6,9 +6,9 @@
 
 """ Terminal GUI application """
 
-import event
-import page
-import system
+from rena import event
+from rena import page
+from rena import system
 
 
 class Application:
@@ -35,9 +35,11 @@ class Application:
         elif e.route_to != self._current_page.name:
             for p in self._pages:
                 if p['page'].name == e.route_to:
+                    self._current_page.on_pause()
                     self._current_page.focus(False)
                     self._current_page = p['page']
                     self._current_page.focus()
+                    self._current_page.on_resume()
                     break
 
     def add_page(self, new_page: type, name: str, is_index: bool = False):
@@ -51,6 +53,7 @@ class Application:
             'index': is_index,
             'page': new_page(name, self.screen_width, self.screen_height, self._event_bus)
         })
+        self._pages[-1]['page'].on_create()
 
     def run(self):
         """
@@ -69,4 +72,6 @@ class Application:
             else:
                 self._current_page.render(force=True)
                 current_name = self._current_page.name
+        for p in self._pages:
+            p['page'].on_destroy()
         system.clear()

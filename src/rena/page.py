@@ -6,10 +6,10 @@
 
 """ Page contains controls """
 
-import event
-import input
-import render
-import layout
+from rena import event
+from rena import input
+from rena import render
+from rena import layout
 
 
 class RouteEvent(event.Event):
@@ -42,6 +42,30 @@ class Page:
         self._layout_manager = layout.LinearLayout(self._renderer)
 
     def _on_key(self, e: input.KeyEvent):
+        pass
+
+    def on_create(self):
+        """
+        Execute on page creation after __init__.
+        """
+        pass
+
+    def on_pause(self):
+        """
+        Execute on page switched to background.
+        """
+        pass
+
+    def on_resume(self):
+        """
+        Execute on page switched to front ground.
+        """
+        pass
+
+    def on_destroy(self):
+        """
+        Execute on application ends.
+        """
         pass
 
     def focus(self, is_focus: bool = True):

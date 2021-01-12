@@ -6,9 +6,9 @@
 
 """ Controls """
 
-import event
-import layout
-import input
+from rena import event
+from rena import layout
+from rena import input
 
 
 class Control:

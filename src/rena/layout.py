@@ -6,7 +6,7 @@
 
 """ Image, menu rendering """
 
-import render
+from rena import render
 
 
 class Layout:

@@ -4,9 +4,10 @@
 # @CreateAt : 2021/1/8 0008
 # @Email : happy.huangyang@gmail.com
 
-""" Windows settings, input, etc. """
+""" Windows settings, input, etc. System dependence features. """
 
 import os
+import time
 import platform
 
 
@@ -26,3 +27,12 @@ def clear():
     """
     if platform.system() == 'Windows':
         os.system('cls')
+
+
+def start_python_console(file: str):
+    """
+    Start a python file in new console
+    """
+    if platform.system() == 'Windows':
+        os.system('start python ' + file)
+    time.sleep(0.5)
